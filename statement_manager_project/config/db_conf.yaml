@@ -1,0 +1,6 @@
+user: root
+host: localhost
+port: 3306
+passwd: 123456
+db: bank_transactions
+
