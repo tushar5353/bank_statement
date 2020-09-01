@@ -1,0 +1,206 @@
+citibank:
+  raw_db: bank_transactions
+  stage_db: bank_transactions
+  master_db: bank_transactions
+  stage_ddl: /ddl/stage_transactions.sql
+  master_ddl: /ddl/master_transactions.sql
+  stage_ddl_tmp: /ddl/stage_transactions_tmp.sql
+  stage_dml: /dml/insert_update_stage_transactions.sql
+  master_dml: /dml/insert_update_master_transactions.sql
+  stage_dml_select_description: /dml/select_description.sql
+  stage_dml_update_categories: /dml/update_categories.sql
+  patterns:
+    <BANKNAME>: citibank
+    <TRANSACTIONS>: transactions
+    <STAGE_TRANSACTIONS>: stage_transactions
+    <MASTER_TRANSACTIONS>: master_transactions
+    <STAGE_DB>: bank_transactions
+    <RAW_DB>: bank_transactions
+    <MASTER_DB>: bank_transactions
+  regex:
+    PURCHASE SUBJECT:
+      category: DEBIT CARD
+      expression:
+        - (\d{2}[A-Z]{3}\d{2}.\d{6})([\w|\s\D]+(?=Ref))
+        - (Card no\D+\d{4}XXX\dXXXX\d{4}\s\d{2}\w{3})\s([\w|\s|\D]+(?=Ref:))
+      group: 1
+
+    IMPS:
+      category: IMPS/UPI
+      expression:
+        - (UPI From)([\D|\d]+(?=,R))
+        - (UPI To)([\D|\d]+(?=,R))
+        - (IMPS\s?TO)\s?(\d+)
+        - (IMPS FROM)([\D\d]+(?=REF))
+      group: 1
+
+    ATM:
+      category: ATM
+      expression: 
+        - (ATM)()
+      group: 0
+
+    LOAN REPAYMENT:
+      category: LOAN EMI
+      expression:
+        - (LOAN REPAYMENT)()
+      group: 0
+
+    INTEREST EARNED:
+      category: INTEREST
+      expression:
+        - (INTEREST EARNED)()
+      group: 0
+
+    Interest Earned:
+      category: INTEREST
+      expression:
+        - (Interest Earned)()
+      group: 0
+
+    PURCHASE REVERSAL:
+      category: REVERSAL
+      expression:
+        - (\d{2}[A-Z]{3}\d{2}.\d{6})([\w|\s\D]+(?=Ref))
+      group: 1
+
+    POS TRANSACTION:
+      category: POINT OF SERVICE
+      expression:
+        - (FUELDISCOUNT|FUEL DISCOUNT)()
+      group: 0
+
+    Payment for Credit Card:
+      category: CC_PAYMENT
+      expression:
+        - (Payment for Credit Card)()
+      group: 0
+
+    SALARY CREDIT:
+      category: SALARY CREDIT
+      expression:
+        - (SALARY CREDIT)()
+      group: 0
+
+    EFT:
+      category: EFT
+      expression:
+        - (\d{14})()
+      group: 0
+
+    FUNDS TRANSFER:
+      category: FUNDS TRANSFER
+      expression:
+        - (FUNDS TRANSFER)()
+      group: 0
+
+    BNKG -MANUAL:
+      category: MANUAL
+      expression:
+        - (MANUAL)()
+      group: 0
+
+    SUSP ENTRIES:
+      category: REVERSAL
+      expression:
+        - ((?i)Reversal)()
+      group: 0
+
+hdfc:
+  raw_db: bank_transactions
+  stage_db: bank_transactions
+  master_db: bank_transactions
+  stage_ddl: /ddl/stage_transactions.sql
+  master_ddl: /ddl/master_transactions.sql
+  stage_ddl_tmp: /ddl/stage_transactions_tmp.sql
+  stage_dml: /dml/insert_update_stage_transactions.sql
+  master_dml: /dml/insert_update_master_transactions.sql
+  stage_dml_select_description: /dml/select_description.sql
+  stage_dml_update_categories: /dml/update_categories.sql
+  patterns:
+    <BANKNAME>: citibank
+    <TRANSACTIONS>: transactions
+    <STAGE_TRANSACTIONS>: stage_transactions
+    <MASTER_TRANSACTIONS>: master_transactions
+    <STAGE_DB>: bank_transactions
+    <RAW_DB>: bank_transactions
+    <MASTER_DB>: bank_transactions
+  regex:
+    UPI:
+      category: UPI
+      expression:
+        - (UPI)-([\d|\w|\s]+)-([\w|\d|\D]+@\w+)
+      group: 2
+
+    POS:
+      category: POINT OF SERVICE
+      expression:
+        - (POS)[\s-]+([\d|\w]+)[\s-]+([\d|\w|\D]+(?=POS))
+        - (CRV POS)[\s-]+([\d||\w]+)[\s-]+([\w|\D]+)
+        - (POS REF)[\s-]+([\d*-/]+)[\s-]+(.+)
+      group: 2
+
+    ATW:
+      category: ATM
+      expression: 
+        - (ATW-[\d|\w]+)-(.+)
+      group: 1
+
+    EAW:
+      category: ATM
+      expression: 
+        - (EAW-[\d|\w]+)-(.+)
+      group: 1
+
+    NWD:
+      category: ATM
+      expression: 
+        - (NWD-[\d|\w]+)-(.+)
+      group: 1
+
+    ATM:
+      category: ATM
+      comparision: contains
+      expression:
+        - (?!.*)()
+      group: 0
+
+    IMPS:
+      category: IMPS
+      expression:
+        - (IMPS)[\s-]+([\d]+)[\s-]+([\w\d\s]+)
+      group: 2
+
+    -INTEREST-:
+      category: INTEREST
+      coontains:
+      expression:
+        - (INTEREST)()
+      group: 0
+
+    -TPT-:
+      category: TPT
+      contains:
+      expression:
+        - (\d+)()
+      group: 0
+
+    -BILLPAY-:
+      category: BILLPAY
+      contains:
+      expression:
+        - (\d+\w+)()
+      group: 0
+
+    NEFT:
+      category: NEFT
+      expression:
+        - (NEFT)[\s-]+([\d|\w-]+(?=-))
+      group: 1
+
+    NA:
+      categorty: GATEWAY
+      expression:
+        - ([\d\w]+)/([A-Z|a-z|\s]+)
+        - (REF)-([A-Z|a-z|\s]+)
+      group: 1
